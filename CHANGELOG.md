@@ -9,11 +9,15 @@ internal API changes are not present.
 
 Main (unreleased)
 -----------------
+
 ### Breaking changes
 
 - Node Exporter configuration options changed to align with new upstream version (@Thor77):
   - `diskstats_ignored_devices` is now `diskstats_device_exclude` in agent configuration.
   - `ignored_devices` is now `device_exclude` in flow configuration.
+
+- Some blocks in Flow components have been merged with their parent block to make the block hierarchy smaller:
+  - `prometheus.scrape > client > http_client_config` is merged into the `client` block. (@erikbaranowski)
 
 ### Features
 
@@ -30,6 +34,8 @@ Main (unreleased)
     forwarding them to other `otelcol` components. (@erikbaranowski)
   - `loki.source.docker` reads logs from Docker containers and forwards them to
     other `loki` components. (@tpaschalis)
+  - `prometheus.integration.apache` collects metrics from an apache web server (@captncraig)
+  - `prometheus.integration.consul` collects metrics from a consul installation (@captncraig)
 
 ### Enhancements
 
@@ -45,17 +51,35 @@ Main (unreleased)
 - Flow: the `loki.process` component now implements all the same processing
   stages as Promtail's pipelines. (@tpaschalis)
 
-- Flow: new metric for `prometheus.scrape` - `agent_prometheus_scrape_targets_gauge`. (@ptodev)
+- Flow: new metric for `prometheus.scrape` -
+  `agent_prometheus_scrape_targets_gauge`. (@ptodev)
 
-- Flow: new metric for `prometheus.scrape` and `prometheus.relabel` - `agent_prometheus_forwarded_samples_total`. (@ptodev)
+- Flow: new metric for `prometheus.scrape` and `prometheus.relabel` -
+  `agent_prometheus_forwarded_samples_total`. (@ptodev)
 
 - Flow: add `constants` into the standard library to expose the hostname, OS,
   and architecture of the system Grafana Agent is running on. (@rfratto)
+
+- Flow: add timeout to loki.source.podlogs controller setup. (@polyrain)
 
 ### Other changes
 
 - Use Go 1.20 for builds. Official release binaries are still produced using Go
   1.19. (@rfratto)
+
+v0.31.3 (2023-02-13)
+--------------------
+
+### Bugfixes
+
+- `loki.source.cloudflare`: fix issue where the `zone_id` argument
+  was being ignored, and the `api_token` argument was being used for the zone
+  instead. (@rfratto)
+
+- `loki.source.cloudflare`: fix issue where `api_token` argument was not marked
+  as a sensitive field. (@rfratto)
+
+- `oath2 > tls_config` was documented as a block but coded incorrectly as an attribute. This is now a block in code. This impacted `discovery.docker`, `discovery.kubernetes`, `loki.source.kubernetes`, `loki.write`, `mimir.rules.kubernetes`, `phlare.scrape`, `phlare.write`, `prometheus.remote_write`, `prometheus.scrape`, and `remote.http`  (@erikbaranowski)
 
 v0.31.2 (2023-02-08)
 --------------------
